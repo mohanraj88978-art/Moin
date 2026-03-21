@@ -218,9 +218,11 @@ nav{
   opacity:0.6;
 }
 .meaning{
-  font-size:10px;letter-spacing:4px;text-transform:uppercase;
-  color:var(--text3);margin-left:-6px;
-
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-left: 0; /* remove -6px */
 }
 
 .balance-hero .eyebrow{
@@ -600,6 +602,11 @@ select option{background:var(--surface2);color:var(--text);}
   .balance-hero .amount{font-size:40px;}
   .modal{padding:20px;}
 }
+.nav-text{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
 </style>
 </head>
 <body>
@@ -636,11 +643,16 @@ gap:20px;
 
 <!-- NAV -->
 <nav>
-  <div class="nav-brand">
-    <div class="nav-logo"><img src="LOGO.png" width="40px"></div>
+ <div class="nav-brand">
+  <div class="nav-logo">
+    <img src="LOGO.png" width="40px">
+  </div>
+
+  <div class="nav-text">
     <div class="nav-name">Moin</div>
     <div class="meaning">Money Intelligence</div>
   </div>
+</div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchView('dashboard')">Dashboard</button>
     <button class="nav-tab" onclick="switchView('transactions')">Transactions</button>
