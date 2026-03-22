@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -596,66 +597,69 @@ select option{background:var(--surface2);color:var(--text);}
 #loginScreen {
   position: fixed;
   inset: 0;
-  background: #080a0f;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 20px;
 }
 
 /* ===== TITLE ===== */
 #loginScreen h1 {
-  color: #c9a84c;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 36px;
+  font-size: 34px;
+  font-weight: 600;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  margin-bottom: 20px;
 }
 
 /* ===== INPUT ===== */
 #usernameInput {
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.1);
-  width: 240px;
-  background: #11131a;
+  width: 260px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: none;
+  background: #1c1c1e;
   color: white;
+  font-size: 16px;
   outline: none;
-  transition: 0.2s;
-}
-
-#usernameInput:focus {
-  border-color: #c9a84c;
-  box-shadow: 0 0 0 2px rgba(201,168,76,0.2);
+  margin-bottom: 15px;
 }
 
 /* ===== ENTER BUTTON ===== */
 #loginScreen button:first-of-type {
-  padding: 12px 22px;
-  background: linear-gradient(135deg, #c9a84c, #e8c87a);
+  width: 260px;
+  padding: 14px;
+  border-radius: 14px;
   border: none;
-  border-radius: 12px;
+  background: white;
+  color: black;
   font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 12px;
   cursor: pointer;
-  color: #080a0f;
   transition: 0.2s;
 }
 
-#loginScreen button:first-of-type:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+#loginScreen button:first-of-type:active {
+  transform: scale(0.97);
+  opacity: 0.85;
 }
 
-/* ===== GOOGLE BUTTON ===== */
+/* ===== GOOGLE BUTTON (APPLE STYLE) ===== */
 #loginScreen button:last-of-type {
+  width: 260px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: #1c1c1e;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: #11131a;
-  color: white;
-  font-weight: 500;
   cursor: pointer;
   transition: 0.2s;
 }
@@ -669,34 +673,14 @@ select option{background:var(--surface2);color:var(--text);}
   background-size: cover;
 }
 
-/* Hover effect */
+/* Hover */
 #loginScreen button:last-of-type:hover {
-  background: #1a1d26;
-  border-color: rgba(255,255,255,0.2);
+  background: #2c2c2e;
 }
 
-/* Click effect */
+/* Click */
 #loginScreen button:last-of-type:active {
   transform: scale(0.97);
-}
-
-/* ── RECURRING BADGE ── */
-.recurring-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--purple);display:inline-block;margin-right:4px;
-}
-
-/* ── RESPONSIVE NAV ── */
-@media(max-width:600px){
-  .nav-tabs .nav-tab{padding:5px 10px;font-size:12px;}
-  .nav-date{display:none;}
-  .balance-hero .amount{font-size:40px;}
-  .modal{padding:20px;}
-}
-.nav-text{
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
 }
 </style>
 </head>
@@ -752,17 +736,7 @@ gap:20px;
     <button class="nav-tab" onclick="switchView('analytics')">Analytics</button>
   </div>
   <div class="nav-date" id="navDate"></div>
-  <button onclick="logoutUser()" style="
-padding:6px 12px;
-border-radius:8px;
-border:none;
-background:#f05c5c;
-color:white;
-cursor:pointer;
-font-size:12px;
-">
-Logout
-</button>
+
   
 </nav>
 
@@ -859,8 +833,22 @@ Logout
   <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">📂 Import</button>
 
   <button class="btn btn-ghost btn-sm" onclick="confirmDeleteAll()">✕ Clear</button>
+  
 
   <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
+  <div class="lo">
+          <button onclick="logoutUser()" style="
+padding:6px 12px;
+border-radius:8px;
+border:none;
+background:#f05c5c;
+color:white;
+cursor:pointer;
+font-size:12px;
+">
+Logout
+</button>
+    </div>
 
 </div>
     </div>
@@ -872,6 +860,8 @@ Logout
       <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
       <div class="filter-chip" onclick="setFilter('INCOME',this)">Income</div>
       <div class="filter-chip" onclick="setFilter('EXPENSE',this)">Expense</div>
+          
+
     </div>
 
     <div class="cat-chips" id="catFilterChips"></div>
@@ -1017,6 +1007,7 @@ Logout
 
 <!-- Toast Stack -->
 <div class="toast-stack" id="toastStack"></div>
+
 
 <script>
 // ══════════════════════════════════════════════════════
