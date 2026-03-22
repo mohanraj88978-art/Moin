@@ -2,6 +2,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+      <!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moin — Master Your Money with Moin.</title>
@@ -588,6 +592,93 @@ select option{background:var(--surface2);color:var(--text);}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:10px;}
+/* ===== LOGIN SCREEN ===== */
+#loginScreen {
+  position: fixed;
+  inset: 0;
+  background: #080a0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== TITLE ===== */
+#loginScreen h1 {
+  color: #c9a84c;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+}
+
+/* ===== INPUT ===== */
+#usernameInput {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  width: 240px;
+  background: #11131a;
+  color: white;
+  outline: none;
+  transition: 0.2s;
+}
+
+#usernameInput:focus {
+  border-color: #c9a84c;
+  box-shadow: 0 0 0 2px rgba(201,168,76,0.2);
+}
+
+/* ===== ENTER BUTTON ===== */
+#loginScreen button:first-of-type {
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #c9a84c, #e8c87a);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #080a0f;
+  transition: 0.2s;
+}
+
+#loginScreen button:first-of-type:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ===== GOOGLE BUTTON ===== */
+#loginScreen button:last-of-type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: #11131a;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* Google icon */
+#loginScreen button:last-of-type::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: url('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg');
+  background-size: cover;
+}
+
+/* Hover effect */
+#loginScreen button:last-of-type:hover {
+  background: #1a1d26;
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* Click effect */
+#loginScreen button:last-of-type:active {
+  transform: scale(0.97);
+}
 
 /* ── RECURRING BADGE ── */
 .recurring-dot{
@@ -638,6 +729,7 @@ gap:20px;
   ">
   Enter App
   </button>
+ <button onclick="googleLogin()">Sign in with Google</button>
 
 </div>
 
@@ -660,6 +752,17 @@ gap:20px;
     <button class="nav-tab" onclick="switchView('analytics')">Analytics</button>
   </div>
   <div class="nav-date" id="navDate"></div>
+  <button onclick="logoutUser()" style="
+padding:6px 12px;
+border-radius:8px;
+border:none;
+background:#f05c5c;
+color:white;
+cursor:pointer;
+font-size:12px;
+">
+Logout
+</button>
   
 </nav>
 
@@ -1545,7 +1648,115 @@ updateAll();
 
 // Check budgets on load
 STORE.budgets.forEach(b=>checkBudgetAlert(b.category));
-// LOGIN SYSTEM
+
+</script>
+<script>
+  
+// 🔥 FIREBASE INIT
+const firebaseConfig = {
+  apiKey: "AIzaSyBhQH5PhqNGxaSqTZHm98cnmSAbLo2GX7E",
+  authDomain: "moin-d4d29.firebaseapp.com",
+  projectId: "moin-d4d29",
+  storageBucket: "moin-d4d29.firebasestorage.app",
+  messagingSenderId: "411018061050",
+  appId: "1:411018061050:web:011b28fb09b69202299543"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const messaging = firebase.messaging();
+
+
+
+// 🔐 GOOGLE LOGIN
+function googleLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+      localStorage.setItem("sw_user", user.displayName);
+      toast("Welcome " + user.displayName + " 🎉");
+      showApp();
+    })
+    .catch((error) => {
+      console.log(error);
+      toast("Login failed ❌", "error");
+    });
+}
+
+
+// 🔔 NOTIFICATION PERMISSION
+async function requestPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+      const token = await messaging.getToken({
+        vapidKey: "REPLACE_WITH_YOUR_VAPID_KEY"
+      });
+
+      console.log("TOKEN:", token);
+      toast("Notifications enabled 🔔");
+
+    } else {
+      toast("Notification blocked ❌", "error");
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+// 📩 FOREGROUND MESSAGE
+messaging.onMessage((payload) => {
+  new Notification(payload.notification.title, {
+    body: payload.notification.body
+  });
+});
+
+
+// =====================
+// YOUR ORIGINAL CODE (UNCHANGED)
+// =====================
+
+// (I kept everything same, only modified checkBudgetAlert)
+
+function checkBudgetAlert(cat){
+  const budget = STORE.budgets.find(b=>b.category===cat);
+  if(!budget) return;
+
+  const spent = getMonthSpend(cat);
+  const pct = spent/budget.limit*100;
+
+  const catInfo = CATS.expense.find(c=>c.id===cat);
+  const label = catInfo?catInfo.label:cat;
+
+  let message = "";
+
+  if(pct>=100){
+    message = `⚠️ ${label} budget exceeded!`;
+    toast(message,'error');
+  }
+  else if(pct>=80){
+    message = `⚠️ ${label} near limit!`;
+    toast(message,'warn');
+  }
+
+  // 🔔 SYSTEM NOTIFICATION
+  if (message && Notification.permission === "granted") {
+    new Notification("Budget Alert 🚨", {
+      body: message
+    });
+  }
+}
+
+
+// =====================
+// LOGIN SYSTEM (same)
+// =====================
 function loginUser() {
   const name = document.getElementById('usernameInput').value.trim();
 
@@ -1568,11 +1779,26 @@ function showApp() {
     document.getElementById("loginScreen").style.display = "flex";
   }
 }
+function logoutUser() {
+  localStorage.removeItem("sw_user"); // remove saved name
 
-// Run on load
+  // if using Google login
+  if (firebase.auth().currentUser) {
+    firebase.auth().signOut();
+  }
+
+  // show login screen again
+  document.getElementById("loginScreen").style.display = "flex";
+
+  toast("Logged out 👋");
+}
+
+
+// 🔥 UPDATED LOAD
 window.onload = function () {
   showApp();
-  updateAll(); // existing function
+  updateAll();
+  requestPermission(); // 🔥 IMPORTANT
 };
 </script>
 </body>
