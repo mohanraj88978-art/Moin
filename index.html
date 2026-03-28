@@ -1,21 +1,10 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <head>
-  <!-- AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7880705839623160"
-     crossorigin="anonymous"></script>
-</head>
-     <script async custom-element="amp-auto-ads"
-        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-</script>
       <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moin — Master Your Money with Moin.</title>
@@ -694,9 +683,6 @@ select option{background:var(--surface2);color:var(--text);}
 </style>
 </head>
 <body>
-     <amp-auto-ads type="adsense"
-        data-ad-client="ca-pub-7880705839623160">
-</amp-auto-ads>
 
   <!-- LOGIN SCREEN -->
 <div id="loginScreen" style="
@@ -841,14 +827,6 @@ gap:20px;
   <button class="btn btn-blue btn-sm" onclick="downloadExcel()">⬇ Export CSV</button>
 
   <button class="btn btn-blue btn-sm" onclick="downloadBackup()">💾 Backup</button>
-
-  <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">📂 Import</button>
-
-  <button class="btn btn-ghost btn-sm" onclick="confirmDeleteAll()">✕ Clear</button>
-  
-
-  <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
-  <div class="lo">
           <button onclick="logoutUser()" style="
 padding:6px 12px;
 border-radius:8px;
@@ -860,6 +838,13 @@ font-size:12px;
 ">
 Logout
 </button>
+
+  <button class="btn btn-ghost btn-sm" onclick="confirmDeleteAll()">✕ Clear</button>
+  
+
+  <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
+  <div class="lo">
+
     </div>
 
 </div>
@@ -1022,6 +1007,24 @@ Logout
 
 
 <script>
+  function showApp() {
+  const name = localStorage.getItem("sw_user");
+
+  if (name) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.querySelector(".nav-name").innerText = name;
+  } else {
+    document.getElementById("loginScreen").style.display = "flex";
+  }
+}
+  firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    document.getElementById("loginScreen").style.display = "none";
+
+    // 👇 FIX
+    document.querySelector(".nav-name").innerText = user.displayName;
+  }
+});
 // ══════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════
@@ -1651,43 +1654,8 @@ updateAll();
 
 // Check budgets on load
 STORE.budgets.forEach(b=>checkBudgetAlert(b.category));
-
-</script>
-<script>
   
-// 🔥 FIREBASE INIT
-const firebaseConfig = {
-  apiKey: "AIzaSyBhQH5PhqNGxaSqTZHm98cnmSAbLo2GX7E",
-  authDomain: "moin-d4d29.firebaseapp.com",
-  projectId: "moin-d4d29",
-  storageBucket: "moin-d4d29.firebasestorage.app",
-  messagingSenderId: "411018061050",
-  appId: "1:411018061050:web:011b28fb09b69202299543"
-};
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const messaging = firebase.messaging();
-
-
-
-// 🔐 GOOGLE LOGIN
-function googleLogin() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  auth.signInWithPopup(provider)
-    .then((result) => {
-      const user = result.user;
-      localStorage.setItem("sw_user", user.displayName);
-      toast("Welcome " + user.displayName + " 🎉");
-      showApp();
-    })
-    .catch((error) => {
-      console.log(error);
-      toast("Login failed ❌", "error");
-    });
-}
 
 
 // 🔔 NOTIFICATION PERMISSION
@@ -1756,7 +1724,6 @@ function checkBudgetAlert(cat){
   }
 }
 
-
 // =====================
 // LOGIN SYSTEM (same)
 // =====================
@@ -1803,6 +1770,58 @@ window.onload = function () {
   updateAll();
   requestPermission(); // 🔥 IMPORTANT
 };
+</script>
+<script>
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyBhQH5PhqNGxaSqTZHm98cnmSAbLo2GX7E",
+  authDomain: "moin-d4d29.firebaseapp.com",
+  projectId: "moin-d4d29",
+  storageBucket: "moin-d4d29.firebasestorage.app",
+  messagingSenderId: "411018061050",
+  appId: "1:411018061050:web:011b28fb09b69202299543"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Google Login
+function googleLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  firebase.auth().signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+
+      localStorage.setItem("sw_user", user.displayName);
+
+      document.querySelector(".nav-name").innerText = user.displayName;
+
+      document.getElementById("loginScreen").style.display = "none";
+
+      toast("Welcome " + user.displayName + " 🔥");
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+}
+
+// Auto login
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    document.getElementById("loginScreen").style.display = "none";
+  }
+});
+
+function logoutUser() {
+  localStorage.removeItem("sw_user");
+
+  if (firebase.auth().currentUser) {
+    firebase.auth().signOut();
+  }
+
+  location.reload();
+}
 </script>
 </body>
 </html>
